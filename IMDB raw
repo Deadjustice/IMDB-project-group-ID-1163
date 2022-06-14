@@ -1,0 +1,229 @@
+# Import the data from IMDB database through the Cinemagoer package
+from imdb import Cinemagoer
+
+# Creating an instance of the Cinemagoer class and the global variable movie 
+ia = Cinemagoer()
+movie = ()
+
+# Source used to see how to install the package: https://cinemagoer.readthedocs.io/en/latest/#
+
+def checkinput(numcheck):   
+    while numcheck.isdigit()==False:
+        numcheck = input("Error - you can only enter a number (integer), please try again: ")
+    return numcheck
+
+#checks if the number is 1,2,3,4 or 5 if not user stuck in loop
+def check14(num):
+    while int(num) not in range(1,6):
+          num = input("Error - You must select one of the options by entering a number between 1 and 5, try again:")
+    return num
+
+#function that forces the user to enter y or n
+def checkyesno(userinput):
+    while str(userinput.upper()) not in ["Y", "N"]:
+        print(userinput.upper())
+        userinput = str(input("ERROR - the answer must be y or n, please select one of these options: "))
+    return userinput.upper()
+
+# Welcome of the program
+print('Welcome to our program! Here you will be able to learn more about your favourite movies and TV shows.')
+print('\n')
+
+# Creating a function for the entire program
+def step():
+    
+# Creating a function for the first part of the program
+
+    def step1():
+
+# User writes down the name of a movie/series
+        name = str(input('Please enter the title of a movie or series you would like to know more about: '))
+
+
+# Searching the input name in the IMDB database, used the following source to see how to do it: https://cinemagoer.readthedocs.io/en/latest/#
+
+        search = ia.search_movie(name)
+
+        print('\n')
+        print('Here are the ones that correspond to that title:')
+
+
+# Loop for printing the name, the movie id and the release year of the "top 20" titles that correspond to the user input, saw how to do it through the source: https://www.geeksforgeeks.org/python-imdbpy-getting-title-from-searched-movie/
+# The "try: except KeyError pass" code is aimed at stopping the "KeyError" exceptions from being raised so that the program can continue to run if they occur, saw how to do it through the source: https://stackoverflow.com/questions/15653966/ignore-keyerror-and-continue-program
+        for i in range(len(search)):
+            id = search[i].movieID
+            try:
+                print(id + " - " + str(search[i]['title']) + " (" + str(search[i]['year']) + ")")
+            except KeyError:
+                pass
+
+
+# In the next step, users can choose to go back and search for another movie/series or to see more information regarding a particular title in the list.
+# To go back they must enter a 0. To keep going, they must enter the movie id behind the title they are interested in.
+        print("\n")
+        
+        a = str(checkinput(input("Please enter the ID corresponding to the movie or 0 if you want to search for another movie: ")))
+        
+# By executing the function step1() if the input is equal to 0, the program will return to the beginning of the function where the user is again asked to enter the title of a movie/series   
+        
+        if int(a)==0:
+            step1()
+        else:
+            global movie
+            movie = a
+
+    step1 ()
+
+# User enters the movie id and "ia.get_movie(movie)" finds all the data for that particular movie, associating it to the object "moviedata"
+    moviedata = ia.get_movie(movie)
+
+# Creating a function for the second part of the program
+    def step2():
+
+        print("\n")
+        print('What would you like to know about this movie/show?')
+
+# The user decides which type of information they want to see for the chosen movie/series. They also have the possibility to go back and search for another title   
+        print(str("(1) ") + str("Plot Summary, Rating and Original Air Date"))
+        print(str("(2) ") + str("Main Crew"))
+        print(str("(3) ") + str("Main Cast"))
+        print(str("(4) ") + str("I'd like to go back and search for something else."))
+        print(str("(5) ") + str("Exit the program."))
+
+
+# The user enters a number from 1-4 depending on the chosen course of action
+        b = int(check14(checkinput(input())))
+
+
+# Each movie in the database has several categories of information which can be acessed by coding moviedata['name of the data category'] 
+# If the user chooses 1, they will see information for the categories plot summary, the movie rating and the original air date.
+# Saw how to do it through a video with link: https://www.youtube.com/watch?v=xKR3wHHgTzs
+        print("\n")
+        if b==1:
+            try:
+                print('Release Date:')
+                print(moviedata['original air date'])
+            except KeyError:
+                pass
+            print("\n")
+
+            try:
+                print('Rating:')
+                print(moviedata['rating'])
+            except KeyError:
+                pass
+            print("\n")
+
+            try:
+                print('Plot Summary:')
+                print(moviedata['plot outline'])
+            except KeyError:
+                pass
+
+            print("\n")
+            print("\n")
+            
+# Like before with step1(), by executing step2() by pressing enter the program will go back to the beginning of the function step2().
+# This method will be applied throughout this second part of the program to allow the user to go back to the beginning of the function, the menu page in a sense.            
+            input("Press Enter to continue...")
+            step2()
+
+
+# If the user chooses 2, they will see information for the categories director, writer, cinematographer and music composer
+# For the code to work in this section, it wasn't enough to code "print(moviedata['director'])" for example, we needed a for loop.
+# Saw how to do it through the source: https://cinemagoer.readthedocs.io/en/latest/#
+        if b==2:
+            print('Directed by:')
+            try:
+                for director in moviedata['director']:
+                    print(director['name'])
+            except KeyError:
+                pass
+            print('\n')
+
+
+            print('Screenplay written by:')
+            try:
+                for writer in moviedata['writer']:
+                    print(writer['name'])
+            except KeyError:
+                pass
+            print('\n')
+
+
+            print('Cinematography by:')
+            try:
+                for cine in moviedata['cinematographer']:
+                    print(cine['name'])
+            except KeyError:
+                pass
+            print('\n')
+
+
+            print('Music by:')
+            try:
+                for music in moviedata['composer']:
+                    print(music['name'])
+            except KeyError:
+                pass
+
+
+# This section aimed at giving the user the possibility to see 10 other movies by the same director
+            print('\n')
+            print('If you would like to see other titles by the same director, please type Y. If you like to go back, type N.')
+            
+# Users input Y if they want to see the other 10 movies, or N if they want to go back to the previous page
+            c = checkyesno(input())
+            if (c=='Y'):
+
+# Here we use a for loop to search in the moviedata dataset for the name of the director again
+# Then, we will create a new object "director" with all the data regarding the director and store the data inside the filmography category of the director in the object "filmography"
+# Finally, we will extract the data from this object and print the top 10 other movies by the director
+# Saw how to do it through the source: https://stackoverflow.com/questions/29642595/get-list-of-movies-directed-by-director-imdbpy
+                try:
+                    for i in moviedata['director']:
+                        director = ia.search_person(i["name"])[0]
+                        ia.update(director)
+                        filmography = director.get('filmography')
+                        print ("Other movies directed by %s:" % director)
+                        for movie_name in filmography["director"][:10]:
+                            print (movie_name)
+                    print("\n")
+                    print("\n")
+                    input("Press Enter to continue...")
+                    step2()
+                except KeyError:
+                    pass
+                
+            if (c=='N'):
+                step2()
+
+
+# If the user chooses 3, they will see information for the category cast, showing the name of the top 10 cast members of this movie, with their respective character's name in front.
+# Saw how to do it through the source: https://stackoverflow.com/questions/39059530/imdbpy-get-the-stars-of-a-movie
+        print("\n")
+        if b==3:
+            print('Main Cast:')
+            cast = moviedata.get('cast')
+            for actor in cast[:10]:
+                print (str(actor['name']) + " as " + str(actor.currentRole))
+
+            print("\n")
+            print("\n")
+            input("Press Enter to continue...")
+            step2()
+
+# If the user chooses 4, they will go back to the beginning of step(), where they will be able to once again enter the name of a movie/series  
+        if b==4:
+            step()
+            
+# If the user chooses 5, the program will come to an end.
+        if b==5:
+            exit()
+
+    step2()
+step()
+
+
+
+
